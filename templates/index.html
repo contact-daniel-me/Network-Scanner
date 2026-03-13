@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Scanner – Traffic Analyzer</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header>
+    <div class="header-left">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+      </svg>
+      <h1>Network Scanner</h1>
+      <span class="badge-app">Traffic Analyzer</span>
+    </div>
+    <div class="header-right">
+      <span class="pulse-dot"></span>
+      <span id="status-text">Monitoring</span>
+      <span style="margin-left:12px;color:#4b5563" id="last-updated">—</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── Stats cards ──────────────────────────────────────────────────── -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Packets</div>
+        <div class="stat-value total" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Blocked Packets</div>
+        <div class="stat-value blocked" id="stat-blocked">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Flagged Packets</div>
+        <div class="stat-value flagged" id="stat-flagged">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Blocked IPs</div>
+        <div class="stat-value bips" id="stat-blocked-ips">—</div>
+      </div>
+    </div>
+
+    <!-- ── Charts ────────────────────────────────────────────────────────── -->
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-header">Traffic Over Time</div>
+        <div class="card-body">
+          <canvas id="timeline-chart" height="90"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">Protocol Distribution</div>
+        <div class="card-body">
+          <canvas id="protocol-chart" height="170"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Alerts ────────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-header">
+        <span>Recent Alerts</span>
+        <span class="text-muted" id="alert-count">0 alerts</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Source IP</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="alerts-body">
+            <tr><td colspan="5" class="no-data">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Blocked IPs ───────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-header">
+        <span>Blocked IPs</span>
+        <button class="btn-danger" id="block-btn">+ Block IP</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>Reason</th>
+              <th>Blocked At</th>
+              <th>Expires</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="blocked-body">
+            <tr><td colspan="5" class="no-data">No blocked IPs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Live Traffic ──────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-header">
+        <span>Live Traffic Feed</span>
+        <span class="text-muted">Last 100 packets</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Source IP</th>
+              <th>Destination IP</th>
+              <th>Proto</th>
+              <th>Src Port</th>
+              <th>Dst Port</th>
+              <th>Size</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="traffic-body" class="mono">
+            <tr><td colspan="8" class="no-data">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Block IP Modal ───────────────────────────────────────────────────── -->
+  <div id="block-modal" class="modal-overlay">
+    <div class="modal">
+      <h3>Block IP Address</h3>
+      <div class="form-group">
+        <label>IP Address</label>
+        <input id="block-ip-input" type="text" placeholder="e.g. 192.168.1.100" />
+      </div>
+      <div class="form-group">
+        <label>Reason (optional)</label>
+        <input id="block-reason-input" type="text" placeholder="Manual block" />
+      </div>
+      <div class="error-msg" id="block-error"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="block-cancel">Cancel</button>
+        <button class="btn-danger" id="block-confirm">Block</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ────────────────────────────────────────────────────────────── -->
+  <div id="toast"><span id="toast-msg"></span></div>
+
+  <script src="/static/js/chart.umd.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
